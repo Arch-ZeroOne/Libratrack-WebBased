@@ -9,3 +9,4 @@ export const getAllStudents = async () => {
   return rows;
 };
   
+

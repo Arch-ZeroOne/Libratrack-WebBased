@@ -19,3 +19,18 @@ export const insertAccount = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const handleLogIn = async (req, res) => {
+  try {
+    const validatedAccount = await accountService.handleLogin(req.body);
+    if (validatedAccount.rows.length != 0) {
+      res.status(200).json({ account: validatedAccount.rows, verified: true });
+      return;
+    }
+
+    res.status(404).json({ message: "Account not found", verified: false });
+  } catch (error) {
+    console.error(("Error logging in", error));
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
