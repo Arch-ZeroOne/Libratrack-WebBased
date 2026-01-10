@@ -2,7 +2,9 @@
 layer(base);
 
 @import "tailwindcss";
-
+@plugin "daisyui" {
+  themes: light --default;
+}
 @custom-variant dark (&:is(.dark *));
 
 @theme {

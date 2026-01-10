@@ -14,6 +14,7 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  StudentIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
@@ -40,6 +41,13 @@ const navItems: NavItem[] = [
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",
+  },
+
+  //Sidebar link for students table
+  {
+    icon: <StudentIcon />,
+    name: "Students",
+    path: "/admin/students",
   },
   {
     name: "Forms",

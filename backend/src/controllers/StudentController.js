@@ -10,3 +10,16 @@ export const getAllStudents = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const deactivateStudent = async (req, res) => {
+  try {
+    const deactivated = await studentService.deactivateStudent(req.params);
+
+    res
+      .status(200)
+      .json({ message: "Student Account Deactivated", data: deactivated });
+  } catch (error) {
+    console.error("Error Deacivating Student:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
