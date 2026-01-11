@@ -35,7 +35,7 @@ const navItems: NavItem[] = [
   {
     icon: <CalenderIcon />,
     name: "Calendar",
-    path: "/calendar",
+    path: "/admin/calendar",
   },
   {
     icon: <UserCircleIcon />,
@@ -52,7 +52,9 @@ const navItems: NavItem[] = [
   {
     name: "Forms",
     icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    subItems: [
+      { name: "Form Elements", path: "/admin/form-elements", pro: false },
+    ],
   },
   {
     name: "Tables",

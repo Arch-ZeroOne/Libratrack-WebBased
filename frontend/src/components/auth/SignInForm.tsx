@@ -1,14 +1,67 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Link } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
+import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
+import client from "../../axiosClient";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleLogIn = async (event: FormEvent) => {
+    event.preventDefault();
+    const payload = {
+      email,
+      password,
+    };
+
+    console.log(payload);
+
+    try {
+      const response = await client.post("accounts/login", payload);
+      const { verified } = response.data;
+
+      if (verified) {
+        Swal.fire({
+          title: "Log in success!",
+          html: "You are being redirected.",
+          timer: 3000,
+          timerProgressBar: true,
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+            setEmail("");
+            setPassword("");
+            navigate("/admin");
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Log in failed:", err);
+      Swal.fire({
+        title: "Account not found",
+        text: "Want to register?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Confirm!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/register");
+        }
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1">
       <div className="w-full max-w-md pt-10 mx-auto">
@@ -83,13 +136,17 @@ export default function SignInForm() {
                 </span>
               </div>
             </div>
-            <form>
+            <form onSubmit={handleLogIn}>
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Email <span className="text-error-500">*</span>{" "}
+                    Email or Username <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input placeholder="info@gmail.com" />
+                  <Input
+                    placeholder="info@gmail.com"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                  />
                 </div>
                 <div>
                   <Label>
@@ -98,6 +155,8 @@ export default function SignInForm() {
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
                       placeholder="Enter your password"
                     />
                     <span

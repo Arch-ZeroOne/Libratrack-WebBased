@@ -1,13 +1,65 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Link } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
-
+import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
+import client from "../../axiosClient";
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [schoolId, setSchoolId] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleRegister = async (event: FormEvent) => {
+    event.preventDefault();
+    const payload = {
+      username,
+      email,
+      password,
+      phone,
+      school_id: schoolId,
+    };
+
+    try {
+      const response = await client.post("/accounts", payload);
+      console.log("Registration successful:", response.data);
+
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setPhone("");
+      setSchoolId("");
+
+      Swal.fire({
+        title: "You are successfully registered",
+        text: "Want to log in now?",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, log me in!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/admin");
+        }
+      });
+    } catch (err) {
+      console.error("Registration failed:", err);
+      Swal.fire({
+        title: "Registration failed",
+        text: "Please try again",
+        icon: "error",
+      });
+    }
+  };
   return (
     <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
       <div className="w-full max-w-md mx-auto mb-5 sm:pt-10">
@@ -82,46 +134,35 @@ export default function SignUpForm() {
                 </span>
               </div>
             </div>
-            <form>
+            <form onSubmit={handleRegister}>
               <div className="space-y-5">
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* <!-- First Name --> */}
                   <div className="sm:col-span-1">
                     <Label>
-                      First Name<span className="text-error-500">*</span>
+                      Username<span className="text-error-500">*</span>
                     </Label>
                     <Input
                       type="text"
-                      id="fname"
-                      name="fname"
-                      placeholder="Enter your first name"
+                      placeholder="Enter your Username"
+                      value={username}
+                      onChange={(event) => setUsername(event.target.value)}
                     />
                   </div>
                   {/* <!-- Last Name --> */}
                   <div className="sm:col-span-1">
                     <Label>
-                      Last Name<span className="text-error-500">*</span>
+                      Email<span className="text-error-500">*</span>
                     </Label>
                     <Input
                       type="text"
-                      id="lname"
-                      name="lname"
-                      placeholder="Enter your last name"
+                      placeholder="Enter your Email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
                     />
                   </div>
                 </div>
-                {/* <!-- Email --> */}
-                <div>
-                  <Label>
-                    Email<span className="text-error-500">*</span>
-                  </Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your email"
-                  />
-                </div>
+
                 {/* <!-- Password --> */}
                 <div>
                   <Label>
@@ -131,6 +172,8 @@ export default function SignUpForm() {
                     <Input
                       placeholder="Enter your password"
                       type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -144,6 +187,31 @@ export default function SignUpForm() {
                     </span>
                   </div>
                 </div>
+                {/* <!-- Phone --> */}
+                <div>
+                  <Label>
+                    Phone<span className="text-error-500">*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    placeholder="Enter your Phone number"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                  />
+                </div>
+                {/* School ID */}
+                <div>
+                  <Label>
+                    School ID<span className="text-error-500">*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    placeholder="Enter your School ID ex: 2023-6018"
+                    value={schoolId}
+                    onChange={(event) => setSchoolId(event.target.value)}
+                  />
+                </div>
+
                 {/* <!-- Checkbox --> */}
                 <div className="flex items-center gap-3">
                   <Checkbox

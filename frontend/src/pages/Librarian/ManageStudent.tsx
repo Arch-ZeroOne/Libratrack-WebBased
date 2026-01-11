@@ -12,7 +12,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 import { ICellRendererParams } from "ag-grid-community";
 
 import { UserDeactivated, PencilIcon } from "../../icons";
-
+import { useNavigate } from "react-router";
 interface Student {
   student_id: number;
   firstname: string;
@@ -35,11 +35,17 @@ interface ActionCellProps extends ICellRendererParams<Student> {
 }
 
 function ManageStudent() {
+  const navigate = useNavigate();
   return (
-    <div>
-      <h1>Manage Student</h1>
+    <section className="flex flex-col gap-2 items-center">
+      <button
+        className="btn btn-primary self-end"
+        onClick={() => navigate("/admin/add-student")}
+      >
+        Add Student
+      </button>
       <StudentTable />
-    </div>
+    </section>
   );
 }
 
@@ -65,8 +71,6 @@ const StudentTable = () => {
         try {
           const request = await client.patch(`/students/${row.student_id}`);
           const data = request.data;
-
-          console.log(data);
 
           if (data) {
             Swal.fire({
@@ -127,7 +131,7 @@ const StudentTable = () => {
 
   // Container: Defines the grid's theme & dimensions.
   return (
-    <div className="mr-auto ml-auto" style={{ width: 1300, height: 700 }}>
+    <div className="mr-auto ml-auto" style={{ width: "100%", height: "700px" }}>
       <AgGridReact
         rowData={rowData}
         columnDefs={colDefs}

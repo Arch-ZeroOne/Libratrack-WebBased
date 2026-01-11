@@ -1,22 +1,28 @@
 import { createBrowserRouter } from "react-router";
 
 //Auth views
-import Login from "./auth/Login";
-import Register from "./auth/Register";
+
+import SignIn from "./pages/AuthPages/SignIn";
+import SignUp from "./pages/AuthPages/SignUp";
 
 //Dashboard Views
 import AppLayout from "./layout/AppLayout";
 import Home from "./pages/Dashboard/Home";
 import ManageStudent from "./pages/Librarian/ManageStudent";
+import Calendar from "./pages/Calendar";
+import FormElements from "./pages/Forms/FormElements";
+import AddNewStudent from "./components/form/librarian/AddNewStudent";
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Login />,
+    element: <SignIn />,
   },
   {
-    path: "/register",
-    element: <Register />,
+    path: "/signup",
+    element: <SignUp />,
   },
+
   {
     path: "/admin",
     element: <AppLayout />,
@@ -28,6 +34,18 @@ const router = createBrowserRouter([
       {
         path: "students",
         element: <ManageStudent />,
+      },
+      {
+        path: "calendar",
+        element: <Calendar />,
+      },
+      {
+        path: "form-elements",
+        element: <FormElements />,
+      },
+      {
+        path: "add-student",
+        element: <AddNewStudent />,
       },
     ],
   },

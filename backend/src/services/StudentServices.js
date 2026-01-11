@@ -9,6 +9,17 @@ export const getAllStudents = async () => {
   return rows;
 };
 
+export const addNewStudent = async (account) => {
+  const { firstname, middlename, lastname, email, phone, schoolId } = account;
+  const today = new Date();
+  const { rows } = await query(
+    "INSERT INTO students (firstname,middlename,lastname,email,phone,school_id,created_at,status) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *",
+    [firstname, middlename, lastname, email, phone, schoolId, today, "Active"]
+  );
+
+  return rows;
+};
+
 export const deactivateStudent = async (account) => {
   const { id } = account;
   const rows = await query(

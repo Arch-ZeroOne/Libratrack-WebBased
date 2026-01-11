@@ -11,6 +11,18 @@ export const getAllStudents = async (req, res) => {
   }
 };
 
+export const addNewStudent = async (req, res) => {
+  try {
+    const newStudent = await studentService.addNewStudent(req.body);
+    res
+      .status(200)
+      .json({ message: "Student successfully addewd", data: newStudent });
+  } catch (error) {
+    console.log("Error While Adding Student:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export const deactivateStudent = async (req, res) => {
   try {
     const deactivated = await studentService.deactivateStudent(req.params);
