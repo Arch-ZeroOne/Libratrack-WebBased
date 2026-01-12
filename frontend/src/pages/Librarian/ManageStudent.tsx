@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import client from "../../axiosClient";
 import Swal from "sweetalert2";
@@ -9,10 +9,11 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 //Imported components for crud operations using action buttons
 
+//TODO creating and finishing update queries and submission
 import { ICellRendererParams } from "ag-grid-community";
-
 import { UserDeactivated, PencilIcon } from "../../icons";
 import { useNavigate } from "react-router";
+
 interface Student {
   student_id: number;
   firstname: string;
@@ -52,9 +53,26 @@ function ManageStudent() {
 // Create new GridExample component
 const StudentTable = () => {
   const [rowData, setRowData] = useState<Student[] | null>(null);
+  const [firstname, setFirstname] = useState("");
+  const [middlename, setMiddleName] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [schoolId, setSchoolId] = useState("");
+  const [creationDate, setCreationDate] = useState<Date | string>(new Date());
+  const [status, setStatus] = useState("");
 
   const onEdit = (row: Student) => {
-    console.log("Edit Button Clicked");
+    handleOpen();
+  };
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+
+    // Implementing update here
+    try {
+    } catch (error) {
+      console.error("Error While Updating");
+    }
   };
 
   const onDelete = (row: Student) => {
@@ -129,15 +147,136 @@ const StudentTable = () => {
     flex: 1,
   };
 
+  const handleOpen = () => {
+    // Added alia for typescript to recognize this
+    const modal = document.getElementById("my_modal_3") as HTMLDialogElement;
+
+    if (modal) modal.showModal();
+  };
+
   // Container: Defines the grid's theme & dimensions.
   return (
-    <div className="mr-auto ml-auto" style={{ width: "100%", height: "700px" }}>
-      <AgGridReact
-        rowData={rowData}
-        columnDefs={colDefs}
-        defaultColDef={defaultColDef}
-      />
-    </div>
+    <>
+      {/* Modal for updating */}
+      {/* You can open the modal using document.getElementById('ID').showModal() method */}
+
+      <dialog id="my_modal_3" className="modal">
+        <div className="modal-box flex flex-col ">
+          <form method="dialog">
+            {/* if there is a button in form, it will close the modal */}
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              ✕
+            </button>
+          </form>
+
+          <h3 className="font-bold text-lg">Update Student</h3>
+          {/* Form Elements */}
+          <form className="grid grid-cols-2 gap-2" onSubmit={onSubmit}>
+            <div>
+              <label className="text-xs">Firstname</label>
+              <input
+                type="text"
+                placeholder="New Firstname"
+                className="input"
+                value={firstname}
+                onChange={(event) => setFirstname(event.target.value)}
+              ></input>
+            </div>
+            <div>
+              <label className="text-xs">Middle Name</label>
+              <input
+                type="text"
+                placeholder="New Middlename"
+                className="input"
+                value={middlename}
+                onChange={(event) => setMiddleName(event.target.value)}
+              ></input>
+            </div>
+            <div>
+              <label className="text-xs">Last Name</label>
+              <input
+                type="text"
+                placeholder="New Lastname"
+                className="input"
+                value={lastname}
+                onChange={(event) => setLastname(event.target.value)}
+              ></input>
+            </div>
+            <div>
+              <label className="text-xs">Gmail</label>
+              <input
+                type="text"
+                placeholder="New Gmail"
+                className="input"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              ></input>
+            </div>
+            <div>
+              <label className="text-xs">Phone</label>
+              <input
+                type="text"
+                placeholder="New Phone"
+                className="input"
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+              ></input>
+            </div>
+            <div>
+              <label className="text-xs"> School ID</label>
+              <input
+                type="text"
+                placeholder="New School ID"
+                className="input"
+                value={schoolId}
+                onChange={(event) => setSchoolId(event.target.value)}
+              ></input>
+            </div>
+            <div>
+              <label className="text-xs">Creation Date</label>
+              <input
+                type="date"
+                className="input"
+                value={`${creationDate}`}
+                onChange={(event) => setCreationDate(event.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs">Status</label>
+              <input
+                type="text"
+                className="input"
+                placeholder="Update Status"
+                list="statuses"
+                value={status}
+                onChange={(event) => setStatus(event.target.value)}
+              />
+              <datalist id="statuses">
+                <option value="Active"></option>
+                <option value="Inactive"></option>
+                <option value="Deactivated"></option>
+                <option value="Banned"></option>
+              </datalist>
+            </div>
+          </form>
+          <button className="btn btn-primary mt-3 self-center">
+            Add Student
+          </button>
+        </div>
+      </dialog>
+
+      {/* Table Component */}
+      <div
+        className="mr-auto ml-auto"
+        style={{ width: "100%", height: "700px" }}
+      >
+        <AgGridReact
+          rowData={rowData}
+          columnDefs={colDefs}
+          defaultColDef={defaultColDef}
+        />
+      </div>
+    </>
   );
 };
 

@@ -20,6 +20,18 @@ export const addNewStudent = async (account) => {
   return rows;
 };
 
+export const getStudent = async (id) => {
+  const rows = await query("SELECT * FROM students WHERE id = $1 RETURNING *");
+
+  return rows;
+};
+
+export const updateStudent = async (id) => {
+  const rows = await query(
+    "UPDATE students SET firstname = $1, middlename = $2, lastname = $3,email = $4,phone = $5,school_id = $6 WHERE student_id = $7 RETURNING *"
+  );
+};
+
 export const deactivateStudent = async (account) => {
   const { id } = account;
   const rows = await query(
