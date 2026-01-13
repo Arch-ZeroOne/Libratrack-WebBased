@@ -4,28 +4,17 @@ import client from "../../axiosClient";
 import Swal from "sweetalert2";
 import type { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react"; // React Data Grid Component
+import { Student, GetStudentPayload } from "../../types/student";
+import * as util from "../../util/util";
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 //Imported components for crud operations using action buttons
 
-//TODO creating and finishing update queries and submission
+//TODO polishing queries and adding modals
 import { ICellRendererParams } from "ag-grid-community";
 import { UserDeactivated, PencilIcon } from "../../icons";
 import { useNavigate } from "react-router";
-
-interface Student {
-  student_id: number;
-  firstname: string;
-  middlename: string;
-  lastname: string;
-  email: string;
-  phone: string;
-  school_id: string;
-  created_at: string;
-  status: string;
-  account_id: number;
-}
 
 //Interface contract for functions
 //Action cell component receieved all normal data plus this added two functions edit and delete
@@ -53,6 +42,8 @@ function ManageStudent() {
 // Create new GridExample component
 const StudentTable = () => {
   const [rowData, setRowData] = useState<Student[] | null>(null);
+  const [selectedStudent, setSelectedStudent] =
+    useState<GetStudentPayload | null>();
   const [firstname, setFirstname] = useState("");
   const [middlename, setMiddleName] = useState("");
   const [lastname, setLastname] = useState("");
@@ -63,13 +54,33 @@ const StudentTable = () => {
   const [status, setStatus] = useState("");
 
   const onEdit = (row: Student) => {
-    handleOpen();
+    handleOpen(row.student_id);
   };
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
+    const payload = {
+      firstname,
+      middlename,
+      lastname,
+      email,
+      phone,
+      schoolId,
+      creationDate,
+      status,
+    };
+
     // Implementing update here
+
+    if (!selectedStudent) {
+      return;
+    }
     try {
+      const response = await client.patch(
+        `/students/update/${selectedStudent.student_id}`,
+        payload
+      );
+      console.log(response.data);
     } catch (error) {
       console.error("Error While Updating");
     }
@@ -147,9 +158,38 @@ const StudentTable = () => {
     flex: 1,
   };
 
-  const handleOpen = () => {
+  const handleOpen = async (id: number) => {
     // Added alia for typescript to recognize this
     const modal = document.getElementById("my_modal_3") as HTMLDialogElement;
+    try {
+      const response = await client.get(`/students/${id}`);
+      const json: GetStudentPayload = response.data;
+      setSelectedStudent(json);
+      if (!response.data) {
+        return;
+      }
+      const {
+        firstname,
+        middlename,
+        lastname,
+        email,
+        phone,
+        school_id,
+        created_at,
+        status,
+      } = json;
+
+      setFirstname(firstname);
+      setMiddleName(middlename);
+      setLastname(lastname);
+      setEmail(email);
+      setPhone(phone);
+      setSchoolId(school_id);
+      setCreationDate(util.getFormattedDate(created_at));
+      setStatus(status);
+    } catch (error) {
+      console.error("Error Occured While Auto Filling:", error);
+    }
 
     if (modal) modal.showModal();
   };
@@ -258,10 +298,10 @@ const StudentTable = () => {
                 <option value="Banned"></option>
               </datalist>
             </div>
+            <button className="btn btn-primary mt-3 self-center">
+              Update Student
+            </button>
           </form>
-          <button className="btn btn-primary mt-3 self-center">
-            Add Student
-          </button>
         </div>
       </dialog>
 

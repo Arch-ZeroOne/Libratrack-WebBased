@@ -35,3 +35,35 @@ export const deactivateStudent = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const getStudent = async (req, res) => {
+  try {
+    const student = await studentService.getStudent(req.params);
+    if (student) {
+      res.status(200).json(student);
+      return;
+    }
+
+    res.status(404).json({ message: "Not Found" });
+  } catch (error) {
+    console.error("Error Getting Student Specific Data:", error);
+    res.statu(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const updateStudent = async (req, res) => {
+  try {
+    const updatedStudent = await studentService.updateStudent(
+      req.params.id,
+      req.body
+    );
+    const { rows } = updatedStudent;
+
+    if (rows.length != 0) {
+      res.status(200).json(updatedStudent.rows);
+    }
+  } catch (error) {
+    console.error("Error Updating Student Data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

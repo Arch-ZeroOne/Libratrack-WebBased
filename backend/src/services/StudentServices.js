@@ -1,5 +1,5 @@
 import { query } from "../dbconfig.js";
-
+import * as util from "../util/utils.js";
 //gets all the students
 
 export const getAllStudents = async () => {
@@ -11,25 +11,61 @@ export const getAllStudents = async () => {
 
 export const addNewStudent = async (account) => {
   const { firstname, middlename, lastname, email, phone, schoolId } = account;
-  const today = new Date();
+
   const { rows } = await query(
     "INSERT INTO students (firstname,middlename,lastname,email,phone,school_id,created_at,status) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *",
-    [firstname, middlename, lastname, email, phone, schoolId, today, "Active"]
+    [
+      firstname,
+      middlename,
+      lastname,
+      email,
+      phone,
+      schoolId,
+      util.getFormattedDate(),
+      "Active",
+    ]
   );
 
   return rows;
 };
 
-export const getStudent = async (id) => {
-  const rows = await query("SELECT * FROM students WHERE id = $1 RETURNING *");
+export const getStudent = async (params) => {
+  const { id } = params;
+  const { rows } = await query("SELECT * FROM students WHERE student_id = $1", [
+    id,
+  ]);
 
-  return rows;
+  return rows[0];
 };
 
-export const updateStudent = async (id) => {
+export const updateStudent = async (id, payload) => {
+  const {
+    firstname,
+    middlename,
+    lastname,
+    email,
+    phone,
+    schoolId,
+    creationDate,
+    status,
+  } = payload;
+
   const rows = await query(
-    "UPDATE students SET firstname = $1, middlename = $2, lastname = $3,email = $4,phone = $5,school_id = $6 WHERE student_id = $7 RETURNING *"
+    "UPDATE students SET firstname = $1, middlename = $2, lastname = $3,email = $4,phone = $5,school_id = $6 , created_at = $7 , status = $8 WHERE student_id = $9 RETURNING *",
+    [
+      firstname,
+      middlename,
+      lastname,
+      email,
+      phone,
+      schoolId,
+      creationDate,
+      status,
+      id,
+    ]
   );
+
+  return rows;
 };
 
 export const deactivateStudent = async (account) => {
