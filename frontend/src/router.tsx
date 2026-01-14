@@ -13,6 +13,10 @@ import Calendar from "./pages/Calendar";
 import FormElements from "./pages/Forms/FormElements";
 import AddNewStudent from "./components/form/librarian/AddNewStudent";
 
+//Student QR Views
+
+import QrCode from "./components/qr/QrCode";
+import ScanQR from "./components/qr/ScanQR";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -46,6 +50,14 @@ const router = createBrowserRouter([
       {
         path: "add-student",
         element: <AddNewStudent />,
+      },
+      {
+        path: "student-qr",
+        element: <QrCode />,
+      },
+      {
+        path: "scan-qr",
+        element: <ScanQR />,
       },
     ],
   },

@@ -42,13 +42,27 @@ const navItems: NavItem[] = [
     name: "User Profile",
     path: "/profile",
   },
-
-  //Sidebar link for students table
   {
     icon: <StudentIcon />,
-    name: "Students",
-    path: "/admin/students",
+    name: "Manage Student",
+    subItems: [
+      {
+        name: "Students Table",
+        path: "/admin/students",
+      },
+      {
+        name: "Add Log",
+        path: "/admin/scan-qr",
+      },
+      {
+        name: "Student QR",
+        path: "/admin/student-qr",
+      },
+    ],
   },
+
+  //Sidebar link for students table
+
   {
     name: "Forms",
     icon: <ListIcon />,
