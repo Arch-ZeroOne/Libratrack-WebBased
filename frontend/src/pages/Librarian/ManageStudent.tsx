@@ -16,11 +16,16 @@ import { ICellRendererParams } from "ag-grid-community";
 import { UserDeactivated, PencilIcon } from "../../icons";
 import { useNavigate } from "react-router";
 
+const MODALACTIONS = {
+  UPDATE: "UPDATE",
+  CLOSE: "CLOSE",
+};
+
 //Interface contract for functions
 //Action cell component receieved all normal data plus this added two functions edit and delete
 //ICellRendererParams<Student> -> ag grid gives the data automatically this line 'types' the data as Student
 interface ActionCellProps extends ICellRendererParams<Student> {
-  onEdit: (row: Student) => void;
+  onEdit: (row: Student, actions: string) => void;
   onDelete: (row: Student) => void;
 }
 
@@ -53,9 +58,23 @@ const StudentTable = () => {
   const [creationDate, setCreationDate] = useState<Date | string>(new Date());
   const [status, setStatus] = useState("");
 
-  const onEdit = (row: Student) => {
-    handleOpen(row.student_id);
+  const fetchData = async () => {
+    try {
+      const response = await client.get("/students");
+      setRowData(response.data);
+    } catch (error) {
+      console.error("Error Retrieving Data:", error);
+    }
   };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const onEdit = (row: Student, action: string) => {
+    //Handles modal closing and opening
+    if (action === MODALACTIONS.UPDATE) handleOpen(row.student_id);
+  };
+
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
@@ -80,7 +99,16 @@ const StudentTable = () => {
         `/students/update/${selectedStudent.student_id}`,
         payload
       );
-      console.log(response.data);
+
+      if (response.data.length != 0) {
+        Swal.fire({
+          title: "Update Success",
+          text: "Student data has been upodated",
+          icon: "success",
+        });
+        fetchData();
+        handleClose();
+      }
     } catch (error) {
       console.error("Error While Updating");
     }
@@ -102,6 +130,7 @@ const StudentTable = () => {
           const data = request.data;
 
           if (data) {
+            fetchData();
             Swal.fire({
               title: "Student Deactivted!",
               text: "Student has been deactivated.",
@@ -114,18 +143,6 @@ const StudentTable = () => {
       }
     });
   };
-
-  useEffect(() => {
-    const getStudents = async () => {
-      try {
-        const response = await client.get("/students");
-        setRowData(response.data);
-      } catch (error) {
-        console.error("Error Retrieving Data:", error);
-      }
-    };
-    getStudents();
-  }, []);
 
   // Column Definitions: Defines & controls grid columns.
   const [colDefs, setColDefs] = useState<ColDef<Student>[]>([
@@ -192,6 +209,11 @@ const StudentTable = () => {
     }
 
     if (modal) modal.showModal();
+  };
+
+  const handleClose = () => {
+    const modal = document.getElementById("my_modal_3") as HTMLDialogElement;
+    if (modal) modal.close();
   };
 
   // Container: Defines the grid's theme & dimensions.
@@ -298,7 +320,7 @@ const StudentTable = () => {
                 <option value="Banned"></option>
               </datalist>
             </div>
-            <button className="btn btn-primary mt-3 self-center">
+            <button className="btn btn-success mt-3 self-center">
               Update Student
             </button>
           </form>
@@ -328,7 +350,7 @@ const ActionCell: React.FC<ActionCellProps> = ({ data, onEdit, onDelete }) => {
 
   return (
     <div className="flex gap-2 justify-center items-center cursor-pointer">
-      <div onClick={() => onEdit(data)}>
+      <div onClick={() => onEdit(data, MODALACTIONS.UPDATE)}>
         <PencilIcon fontSize={28} />
       </div>
       <div>

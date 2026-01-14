@@ -15,7 +15,7 @@ export const addNewStudent = async (req, res) => {
   try {
     const newStudent = await studentService.addNewStudent(req.body);
     res
-      .status(200)
+      .status(201)
       .json({ message: "Student successfully addewd", data: newStudent });
   } catch (error) {
     console.log("Error While Adding Student:", error);

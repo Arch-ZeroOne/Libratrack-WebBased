@@ -7,6 +7,8 @@ import { EyeCloseIcon, EyeIcon, TimeIcon } from "../../../icons";
 import DatePicker from "../date-picker.tsx";
 import client from "../../../axiosClient.ts";
 import Swal from "sweetalert2";
+import { API_STATUS } from "../../../constants/statuses.ts";
+import { useNavigate } from "react-router";
 export default function AddNewStudent() {
   //TODO polishing the ui here and will add modals or alerts
 
@@ -16,6 +18,7 @@ export default function AddNewStudent() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [schoolId, setSchoolId] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -30,7 +33,37 @@ export default function AddNewStudent() {
       };
 
       const response = await client.post("/students", payload);
-      console.log(response);
+      const { status } = response;
+
+      if (status === API_STATUS.CREATED) {
+        Swal.fire({
+          title: "Student Has Been Created?",
+          text: "Do you want to go back?",
+          icon: "success",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes Please",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/admin/students");
+          }
+        });
+      }
+      if (status === API_STATUS.SERVER_ERROR) {
+        Swal.fire({
+          title: "Error Creating Student",
+          text: "Student adding unsuccessfull",
+          icon: "error",
+        });
+      }
+
+      setFirstname("");
+      setMiddleName("");
+      setLastname("");
+      setEmail("");
+      setPhone("");
+      setSchoolId("");
     } catch (error) {
       console.error("Error Adding Student:", error);
     }
