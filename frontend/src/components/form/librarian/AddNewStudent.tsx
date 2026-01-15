@@ -2,9 +2,6 @@ import { FormEvent, useState } from "react";
 import ComponentCard from "../../common/ComponentCard";
 import Label from "../Label";
 import Input from "../input/InputField";
-import Select from "../Select";
-import { EyeCloseIcon, EyeIcon, TimeIcon } from "../../../icons";
-import DatePicker from "../date-picker.tsx";
 import client from "../../../axiosClient.ts";
 import Swal from "sweetalert2";
 import { API_STATUS } from "../../../constants/statuses.ts";
@@ -17,7 +14,6 @@ export default function AddNewStudent() {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [schoolId, setSchoolId] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent) => {
@@ -29,7 +25,6 @@ export default function AddNewStudent() {
         lastname,
         email,
         phone,
-        schoolId,
       };
 
       const response = await client.post("/students", payload);
@@ -63,7 +58,6 @@ export default function AddNewStudent() {
       setLastname("");
       setEmail("");
       setPhone("");
-      setSchoolId("");
     } catch (error) {
       console.error("Error Adding Student:", error);
     }
@@ -116,15 +110,6 @@ export default function AddNewStudent() {
               placeholder="ex:091234567890"
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="inputTwo">School ID</Label>
-            <Input
-              type="text"
-              placeholder="ex:2023-6018"
-              value={schoolId}
-              onChange={(event) => setSchoolId(event.target.value)}
             />
           </div>
 

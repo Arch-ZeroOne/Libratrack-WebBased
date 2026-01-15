@@ -52,7 +52,7 @@ const router = createBrowserRouter([
         element: <AddNewStudent />,
       },
       {
-        path: "student-qr",
+        path: "student-qr:id",
         element: <QrCode />,
       },
       {

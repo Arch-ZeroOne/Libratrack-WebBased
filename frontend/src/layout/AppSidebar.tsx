@@ -54,10 +54,6 @@ const navItems: NavItem[] = [
         name: "Add Log",
         path: "/admin/scan-qr",
       },
-      {
-        name: "Student QR",
-        path: "/admin/student-qr",
-      },
     ],
   },
 

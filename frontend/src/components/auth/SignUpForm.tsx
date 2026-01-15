@@ -14,7 +14,6 @@ export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
-  const [schoolId, setSchoolId] = useState("");
 
   const navigate = useNavigate();
 
@@ -25,7 +24,6 @@ export default function SignUpForm() {
       email,
       password,
       phone,
-      school_id: schoolId,
     };
 
     try {
@@ -36,7 +34,6 @@ export default function SignUpForm() {
       setEmail("");
       setPassword("");
       setPhone("");
-      setSchoolId("");
 
       Swal.fire({
         title: "You are successfully registered",
@@ -197,18 +194,6 @@ export default function SignUpForm() {
                     placeholder="Enter your Phone number"
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
-                  />
-                </div>
-                {/* School ID */}
-                <div>
-                  <Label>
-                    School ID<span className="text-error-500">*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    placeholder="Enter your School ID ex: 2023-6018"
-                    value={schoolId}
-                    onChange={(event) => setSchoolId(event.target.value)}
                   />
                 </div>
 

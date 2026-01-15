@@ -13,7 +13,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 //TODO polishing queries and adding modals
 import { ICellRendererParams } from "ag-grid-community";
-import { UserDeactivated, PencilIcon } from "../../icons";
+import { UserDeactivated, PencilIcon, EyeIcon } from "../../icons";
 import { useNavigate } from "react-router";
 
 const MODALACTIONS = {
@@ -27,6 +27,7 @@ const MODALACTIONS = {
 interface ActionCellProps extends ICellRendererParams<Student> {
   onEdit: (row: Student, actions: string) => void;
   onDelete: (row: Student) => void;
+  onShow: (row: Student) => void;
 }
 
 function ManageStudent() {
@@ -57,6 +58,7 @@ const StudentTable = () => {
   const [schoolId, setSchoolId] = useState("");
   const [creationDate, setCreationDate] = useState<Date | string>(new Date());
   const [status, setStatus] = useState("");
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     try {
@@ -144,6 +146,10 @@ const StudentTable = () => {
     });
   };
 
+  const onShow = (row: Student) => {
+    navigate(`/student-qr/${row.school_id}`);
+  };
+
   // Column Definitions: Defines & controls grid columns.
   const [colDefs, setColDefs] = useState<ColDef<Student>[]>([
     { field: "firstname", headerName: "First Name" },
@@ -166,6 +172,7 @@ const StudentTable = () => {
       cellRendererParams: {
         onEdit,
         onDelete,
+        onShow,
       },
       cellRenderer: ActionCell,
     },
@@ -344,7 +351,12 @@ const StudentTable = () => {
 
 //Action buttons
 
-const ActionCell: React.FC<ActionCellProps> = ({ data, onEdit, onDelete }) => {
+const ActionCell: React.FC<ActionCellProps> = ({
+  data,
+  onEdit,
+  onDelete,
+  onShow,
+}) => {
   //Returns if there is no data
   if (!data) return null;
 
@@ -355,6 +367,9 @@ const ActionCell: React.FC<ActionCellProps> = ({ data, onEdit, onDelete }) => {
       </div>
       <div>
         <UserDeactivated fontSize={25} onClick={() => onDelete(data)} />
+      </div>
+      <div>
+        <EyeIcon fontSize={30} onClick={() => onShow(data)} />
       </div>
     </div>
   );

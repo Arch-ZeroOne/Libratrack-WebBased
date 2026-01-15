@@ -85,6 +85,7 @@ function ScanQR() {
   const onError = () => {};
   return (
     <div className="App">
+      <h1>Scan Student QR</h1>
       <HTML5QrCodePlugin
         fps={10}
         qrbox={250}

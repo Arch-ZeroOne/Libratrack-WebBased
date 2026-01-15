@@ -24,8 +24,6 @@ export default function SignInForm() {
       password,
     };
 
-    console.log(payload);
-
     try {
       const response = await client.post("accounts/login", payload);
       const { verified } = response.data;
