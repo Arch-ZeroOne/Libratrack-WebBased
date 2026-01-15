@@ -147,7 +147,7 @@ const StudentTable = () => {
   };
 
   const onShow = (row: Student) => {
-    navigate(`/student-qr/${row.school_id}`);
+    navigate(`/admin/student-qr/${row.school_id}`);
   };
 
   // Column Definitions: Defines & controls grid columns.
@@ -362,13 +362,16 @@ const ActionCell: React.FC<ActionCellProps> = ({
 
   return (
     <div className="flex gap-2 justify-center items-center cursor-pointer">
-      <div onClick={() => onEdit(data, MODALACTIONS.UPDATE)}>
+      <div
+        onClick={() => onEdit(data, MODALACTIONS.UPDATE)}
+        title="Edit Student"
+      >
         <PencilIcon fontSize={28} />
       </div>
-      <div>
+      <div title="Deactivate Student">
         <UserDeactivated fontSize={25} onClick={() => onDelete(data)} />
       </div>
-      <div>
+      <div title="View Student">
         <EyeIcon fontSize={30} onClick={() => onShow(data)} />
       </div>
     </div>

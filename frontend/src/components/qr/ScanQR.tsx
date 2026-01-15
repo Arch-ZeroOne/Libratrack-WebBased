@@ -2,6 +2,29 @@ import { useEffect } from "react";
 import { Html5QrcodeResult, Html5QrcodeScanner } from "html5-qrcode";
 import { CreateConfigProps, ComponentCallbackProps } from "../../types/qrcode";
 
+//TODO
+//Implement Logging of student through qr
+
+// React Grid Logic
+import React, { StrictMode, useState } from "react";
+// Theme
+import type { ColDef } from "ag-grid-community";
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+// Core CSS
+import { AgGridReact } from "ag-grid-react";
+
+import { QRCodeIcon } from "../../icons";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
+
+// Row Data Interface
+interface IRow {
+  make: string;
+  model: string;
+  price: number;
+  electric: boolean;
+}
+
 const qrCodeRegionId = "html5qr-code-full-region";
 
 //settings for camera
@@ -84,17 +107,49 @@ function ScanQR() {
   };
   const onError = () => {};
   return (
-    <div className="App">
-      <h1>Scan Student QR</h1>
-      <HTML5QrCodePlugin
-        fps={10}
-        qrbox={250}
-        disableFlip={false}
-        qrCodeSuccessCallback={onNewScanResult}
-        qrCodeErrorCallback={onError}
-      />
-    </div>
+    <section>
+      <div className="flex items-center gap-3">
+        <QRCodeIcon fontSize={50} />
+        <h1 className="text-2xl font-bold">Student Logs</h1>
+      </div>
+      <div className="flex flex-col items-center w-full">
+        <HTML5QrCodePlugin
+          fps={10}
+          qrbox={250}
+          disableFlip={false}
+          qrCodeSuccessCallback={onNewScanResult}
+          qrCodeErrorCallback={onError}
+        />
+        <div className="flex justify-center">
+          <GridExample />
+        </div>
+      </div>
+    </section>
   );
 }
+
+// Create new GridExample component
+const GridExample = () => {
+  // Row Data: The data to be displayed.
+  const [rowData, setRowData] = useState<IRow[]>([
+    { make: "Tesla", model: "Model Y", price: 64950, electric: true },
+    { make: "Ford", model: "F-Series", price: 33850, electric: false },
+    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+  ]);
+
+  // Column Definitions: Defines & controls grid columns.
+  const [colDefs, setColDefs] = useState<ColDef<IRow>[]>([
+    { field: "make" },
+    { field: "model" },
+    { field: "price" },
+    { field: "electric" },
+  ]);
+
+  return (
+    <div style={{ width: 800, height: 800 }}>
+      <AgGridReact rowData={rowData} columnDefs={colDefs} />
+    </div>
+  );
+};
 
 export default ScanQR;
