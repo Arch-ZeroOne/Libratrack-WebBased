@@ -23,3 +23,16 @@ export const getStudentCount = async () => {
 
   return parseInt(rows[0].count);
 };
+
+export function getFormattedTime() {
+  const today = new Date();
+  const shortTime = today.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    //AM or PM
+    hour12: true,
+  });
+
+  return shortTime;
+}

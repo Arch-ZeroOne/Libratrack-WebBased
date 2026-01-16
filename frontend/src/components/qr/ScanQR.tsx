@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { Html5QrcodeResult, Html5QrcodeScanner } from "html5-qrcode";
 import { CreateConfigProps, ComponentCallbackProps } from "../../types/qrcode";
-
+import { Log } from "../../types/logs";
+import client from "../../axiosClient";
 //TODO
 //Implement Logging of student through qr
 
 // React Grid Logic
-import React, { StrictMode, useState } from "react";
+import { useState, useRef } from "react";
 // Theme
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
@@ -16,16 +17,6 @@ import { AgGridReact } from "ag-grid-react";
 import { QRCodeIcon } from "../../icons";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-// Row Data Interface
-interface IRow {
-  make: string;
-  model: string;
-  price: number;
-  electric: boolean;
-}
-
-const qrCodeRegionId = "html5qr-code-full-region";
 
 //settings for camera
 const createConfig = (props: ComponentCallbackProps) => {
@@ -60,51 +51,86 @@ const createConfig = (props: ComponentCallbackProps) => {
 };
 
 const HTML5QrCodePlugin = (props: ComponentCallbackProps) => {
+  const qrCodeRegionId = "html5qr-code-full-region";
+
+  //Declare ref for scanner as it is asynchronous
+  const scannerRef = useRef<Html5QrcodeScanner | null | undefined>(null);
+  const scannerStart = useRef(false);
+  //Initialized to hold a global reference
+
   useEffect(() => {
-    //When component mounts
+    console.log(scannerStart.current);
+    const startScan = () => {
+      //Creates the configuration
+      const config = createConfig(props);
+      //Wether to display extra information
+      const verbose = props.verbose === true;
 
-    //Creates the configuration
-    const config = createConfig(props);
-    //Wether to display extra information
-    const verbose = props.verbose === true;
+      //Runs when a qr code is found
+      if (!props.qrCodeSuccessCallback) {
+        throw "qrCodeSuccessCallback is required callback";
+      }
 
-    //Runs when a qr code is found
-    if (!props.qrCodeSuccessCallback) {
-      throw "qrCodeSuccessCallback is required callback";
-    }
+      //Guard lock to prevent double cameras rendered
 
-    //Creates the instance of the scanner
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-      qrCodeRegionId,
-      config,
-      verbose
-    );
+      //Creates the instance of the scanner
+      const html5QrcodeScanner = new Html5QrcodeScanner(
+        qrCodeRegionId,
+        config,
+        verbose
+      );
 
-    //Executes functions wether error or not
-    html5QrcodeScanner.render(
-      props.qrCodeSuccessCallback,
-      props.qrCodeErrorCallback
-    );
+      //Executes functions wether error or not
+      html5QrcodeScanner.render(
+        props.qrCodeSuccessCallback,
+        props.qrCodeErrorCallback
+      );
+
+      scannerStart.current = true;
+
+      return html5QrcodeScanner;
+    };
+
+    const initScanner = () => {
+      if (scannerStart.current) return;
+      scannerRef.current = startScan();
+    };
+
+    initScanner();
 
     //cleanup function
     return () => {
-      html5QrcodeScanner.clear().catch((error) => {
-        console.error("Failed to clear html5QrCodeScanner", error);
-      });
+      const clearScanner = () => {
+        try {
+          if (scannerRef.current) scannerRef.current.clear();
+        } catch (error) {
+          console.error("Failed to clear html5QrCodeScanner", error);
+        }
+      };
+      clearScanner();
+      scannerStart.current = false;
     };
   }, []);
 
   return <div id={qrCodeRegionId}></div>;
 };
 function ScanQR() {
-  const onNewScanResult = (
+  const onNewScanResult = async (
     decodedText: string,
     decodedResult: Html5QrcodeResult
   ) => {
-    //Handles decoded result
-
-    console.log(decodedText);
+    try {
+      console.log(decodedText);
+      const response = await client.post("/logs/login", { id: decodedText });
+      const { data } = response;
+      console.log(data);
+    } catch (error) {
+      console.error("Error Logging Student:", error);
+    }
   };
+
+  const getData = async () => {};
+
   const onError = () => {};
   return (
     <section>
@@ -131,19 +157,29 @@ function ScanQR() {
 // Create new GridExample component
 const GridExample = () => {
   // Row Data: The data to be displayed.
-  const [rowData, setRowData] = useState<IRow[]>([
-    { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-    { make: "Ford", model: "F-Series", price: 33850, electric: false },
-    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-  ]);
+  const [rowData, setRowData] = useState<Log[] | null>(null);
 
   // Column Definitions: Defines & controls grid columns.
-  const [colDefs, setColDefs] = useState<ColDef<IRow>[]>([
-    { field: "make" },
-    { field: "model" },
-    { field: "price" },
-    { field: "electric" },
+  const [colDefs, setColDefs] = useState<ColDef<Log>[]>([
+    { field: "school_id" },
+    { field: "time_in" },
+    { field: "time_out" },
   ]);
+
+  useEffect(() => {
+    try {
+      const fetchLogs = async () => {
+        const response = await client.get("/logs");
+        let { data } = response;
+
+        console.log(data);
+        setRowData(data);
+      };
+      fetchLogs();
+    } catch (error) {
+      console.error("Error Fetching Logs:", error);
+    }
+  }, []);
 
   return (
     <div style={{ width: 800, height: 800 }}>

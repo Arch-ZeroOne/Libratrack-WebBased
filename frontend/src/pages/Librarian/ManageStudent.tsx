@@ -6,12 +6,12 @@ import type { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react"; // React Data Grid Component
 import { Student, GetStudentPayload } from "../../types/student";
 import * as util from "../../util/util";
+
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 //Imported components for crud operations using action buttons
 
-//TODO polishing queries and adding modals
 import { ICellRendererParams } from "ag-grid-community";
 import { UserDeactivated, PencilIcon, EyeIcon } from "../../icons";
 import { useNavigate } from "react-router";
