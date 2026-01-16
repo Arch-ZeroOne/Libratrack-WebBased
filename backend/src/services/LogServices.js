@@ -8,6 +8,20 @@ export const logs = async () => {
 };
 export const logIn = async (params) => {
   const { id } = params;
+
+  //Check active sessions (Not logged out user)
+  const { rows: active } = await query(
+    "SELECT * FROM logs WHERE school_id = $1 AND time_out IS NULL",
+    [id]
+  );
+
+  if (active.length > 0) {
+    await logOut(id);
+    //Prevent default logging in
+    return;
+  }
+
+  //Logs in new logged user
   const { rows } = await query(
     "INSERT INTO logs (school_id,time_in,date_logged) VALUES ($1,$2,$3) RETURNING *",
     [id, util.getFormattedTime(), util.getFormattedDate()]

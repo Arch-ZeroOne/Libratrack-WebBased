@@ -3,6 +3,8 @@ import { Html5QrcodeResult, Html5QrcodeScanner } from "html5-qrcode";
 import { CreateConfigProps, ComponentCallbackProps } from "../../types/qrcode";
 import { Log } from "../../types/logs";
 import client from "../../axiosClient";
+import { useRow } from "../../context/LogsRowContext";
+import toast, { Toaster } from "react-hot-toast";
 //TODO
 //Implement Logging of student through qr
 
@@ -115,25 +117,42 @@ const HTML5QrCodePlugin = (props: ComponentCallbackProps) => {
   return <div id={qrCodeRegionId}></div>;
 };
 function ScanQR() {
+  const { rowData, setRowData } = useRow();
+
   const onNewScanResult = async (
     decodedText: string,
     decodedResult: Html5QrcodeResult
   ) => {
     try {
-      console.log(decodedText);
+      //Logs in or Logs out the Student
       const response = await client.post("/logs/login", { id: decodedText });
       const { data } = response;
-      console.log(data);
+      nofify();
+      getData();
     } catch (error) {
       console.error("Error Logging Student:", error);
     }
   };
 
-  const getData = async () => {};
+  const getData = () => {
+    try {
+      const fetchLogs = async () => {
+        const response = await client.get("/logs");
+        const { data } = response;
+        setRowData(data);
+      };
+      fetchLogs();
+    } catch (error) {
+      console.error("Error Fetching Logs:", error);
+    }
+  };
 
   const onError = () => {};
+
+  const nofify = () => toast.success("Student Logged In");
   return (
     <section>
+      <Toaster />
       <div className="flex items-center gap-3">
         <QRCodeIcon fontSize={50} />
         <h1 className="text-2xl font-bold">Student Logs</h1>
@@ -147,7 +166,7 @@ function ScanQR() {
           qrCodeErrorCallback={onError}
         />
         <div className="flex justify-center">
-          <GridExample />
+          <LogsTable />
         </div>
       </div>
     </section>
@@ -155,9 +174,9 @@ function ScanQR() {
 }
 
 // Create new GridExample component
-const GridExample = () => {
+const LogsTable = () => {
   // Row Data: The data to be displayed.
-  const [rowData, setRowData] = useState<Log[] | null>(null);
+  const { rowData, setRowData } = useRow();
 
   // Column Definitions: Defines & controls grid columns.
   const [colDefs, setColDefs] = useState<ColDef<Log>[]>([
@@ -172,7 +191,6 @@ const GridExample = () => {
         const response = await client.get("/logs");
         let { data } = response;
 
-        console.log(data);
         setRowData(data);
       };
       fetchLogs();

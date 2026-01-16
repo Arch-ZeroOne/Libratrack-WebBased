@@ -6,14 +6,17 @@ import "flatpickr/dist/flatpickr.css";
 import { AppWrapper } from "./components/common/PageMeta.tsx";
 import { ThemeProvider } from "./context/ThemeContext.tsx";
 import { RouterProvider } from "react-router";
+import { LogsProvider } from "./context/LogsRowContext.tsx";
 import router from "./router.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
-      <AppWrapper>
-        <RouterProvider router={router} />
-      </AppWrapper>
+      <LogsProvider>
+        <AppWrapper>
+          <RouterProvider router={router} />
+        </AppWrapper>
+      </LogsProvider>
     </ThemeProvider>
   </StrictMode>
 );
