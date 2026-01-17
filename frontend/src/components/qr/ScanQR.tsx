@@ -1,6 +1,10 @@
 import { useEffect } from "react";
 import { Html5QrcodeResult, Html5QrcodeScanner } from "html5-qrcode";
-import { CreateConfigProps, ComponentCallbackProps } from "../../types/qrcode";
+import {
+  CreateConfigProps,
+  ComponentCallbackProps,
+  HandleAddProps,
+} from "../../types/qrcode";
 import { Log } from "../../types/logs";
 import client from "../../axiosClient";
 import { useRow } from "../../context/LogsRowContext";
@@ -17,7 +21,9 @@ import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 // Core CSS
 import { AgGridReact } from "ag-grid-react";
 
-import { QRCodeIcon, BarcodeScannerIcon, CrossIcon } from "../../icons";
+import { QRCodeIcon, BarcodeScannerIcon, CrossIcon, IdIcon } from "../../icons";
+
+import { API_STATUS } from "../../constants/statuses";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -119,6 +125,7 @@ const HTML5QrCodePlugin = (props: ComponentCallbackProps) => {
 };
 function ScanQR() {
   const { rowData, setRowData } = useRow();
+  const [schoolId, setSchoolId] = useState<string>();
   const [qrValue, setQrValue] = useState<string>();
   const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -130,7 +137,10 @@ function ScanQR() {
       //Logs in or Logs out the Student
       const response = await client.post("/logs/login", { id: decodedText });
       const { data } = response;
-
+      const { status } = error.response;
+      if (status === API_STATUS.NOT_FOUND) {
+        notifyFailure();
+      }
       nofify();
       getData();
     } catch (error) {
@@ -162,6 +172,12 @@ function ScanQR() {
     modal.showModal();
   };
 
+  const handleAddLog = () => {
+    const modal = document.getElementById("addModal") as HTMLDialogElement;
+    modalRef.current = modal;
+    modal.showModal();
+  };
+
   const onKeyDown = async (e: React.KeyboardEvent) => {
     console.log(e.key);
     if (e.key === "Enter") {
@@ -175,15 +191,45 @@ function ScanQR() {
         setQrValue("");
         if (modalRef.current) modalRef.current.close();
       } catch (error) {
+        const { status } = error.response;
+        if (status === API_STATUS.NOT_FOUND) {
+          notifyFailure();
+        }
         console.error("Error While Scanning in barcode:", error);
       }
     }
   };
 
+  const onSubmit = async () => {
+    try {
+      const response = await client.post("/logs/login", {
+        id: `STU-${schoolId}`,
+      });
+      const { data } = response;
+
+      if (modalRef.current) modalRef.current.close();
+      nofify();
+      getData();
+      setSchoolId("");
+    } catch (error) {
+      const { status } = error.response;
+      if (status === API_STATUS.NOT_FOUND) {
+        notifyFailure();
+      }
+      console.error("Error Adding New Log:", error);
+    }
+  };
+
   const nofify = () => toast.success("Student Logged In");
+  const notifyFailure = () => toast.error("Student Not Found");
   return (
     <section className="flex flex-col">
       <Toaster />
+      <AddLogModal
+        schoolId={schoolId}
+        setSchoolId={setSchoolId}
+        handleSubmit={onSubmit}
+      />
       {/* Modal for barcode prompt */}
       {/* Open the modal using document.getElementById('ID').showModal() method */}
 
@@ -226,7 +272,10 @@ function ScanQR() {
               Use Scanner
               <BarcodeScannerIcon fontSize={30} />
             </button>
-            <button className="btn btn-outline btn-success">
+            <button
+              className="btn btn-outline btn-success"
+              onClick={() => handleAddLog()}
+            >
               Add Log <CrossIcon fontSize={30} color="white" />
             </button>
           </div>
@@ -280,6 +329,47 @@ const LogsTable = () => {
     <div style={{ width: 800, height: 800 }}>
       <AgGridReact rowData={rowData} columnDefs={colDefs} />
     </div>
+  );
+};
+
+const AddLogModal = ({
+  handleSubmit,
+  setSchoolId,
+  schoolId,
+}: HandleAddProps) => {
+  return (
+    <>
+      <dialog id="addModal" className="modal ">
+        <div className="modal-box w-100">
+          <form method="dialog">
+            {/* if there is a button in form, it will close the modal */}
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              ✕
+            </button>
+          </form>
+          <section className="flex flex-col items-center gap-3">
+            <div className="flex ">
+              <h3 className="font-bold text-lg ">Enter Student School ID</h3>
+              <IdIcon fontSize={30} />
+            </div>
+            <div className="flex items-center gap-3">
+              <label>STU - </label>
+              <input
+                type="text"
+                placeholder="Type here"
+                className="input w-70 p-5"
+                autoFocus
+                value={schoolId}
+                onChange={(event) => setSchoolId(event.target.value)}
+              />
+            </div>
+            <button className="btn btn-primary" onClick={handleSubmit}>
+              Add Log
+            </button>
+          </section>
+        </div>
+      </dialog>
+    </>
   );
 };
 

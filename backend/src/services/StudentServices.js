@@ -23,7 +23,7 @@ export const addNewStudent = async (account) => {
       schoolId,
       util.getFormattedDate(),
       "Active",
-    ]
+    ],
   );
 
   return rows;
@@ -62,7 +62,7 @@ export const updateStudent = async (id, payload) => {
       creationDate,
       status,
       id,
-    ]
+    ],
   );
 
   return rows;
@@ -72,8 +72,15 @@ export const deactivateStudent = async (account) => {
   const { id } = account;
   const rows = await query(
     "UPDATE students SET status = $1 WHERE student_id = $2 RETURNING *",
-    ["Deactivated", id]
+    ["Deactivated", id],
   );
 
   return rows;
+};
+export const searchStudent = async (schoolId) => {
+  const { rows } = await query("SELECT * FROM students WHERE school_id = $1", [
+    schoolId,
+  ]);
+
+  return rows.length !== 0;
 };

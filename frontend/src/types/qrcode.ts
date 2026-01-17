@@ -1,15 +1,23 @@
 import { QrcodeErrorCallback, QrcodeSuccessCallback } from "html5-qrcode";
+import { Dispatch, SetStateAction } from "react";
 
-export interface CreateConfigProps {
+export type CreateConfigProps = {
   fps: number;
   qrbox: number;
   aspectRatio?: number;
   disableFlip?: boolean;
-}
-export interface QrConfigProps {
+};
+export type QrConfigProps = {
   verbose?: boolean;
   qrCodeSuccessCallback: QrcodeSuccessCallback;
   qrCodeErrorCallback: QrcodeErrorCallback;
-}
+};
 
+export type HandleAddProps = {
+  //Default handling type for states
+  schoolId: string | undefined;
+  //Typing the setter
+  setSchoolId: Dispatch<SetStateAction<string | undefined>>;
+  handleSubmit: () => void;
+};
 export type ComponentCallbackProps = CreateConfigProps & QrConfigProps;
