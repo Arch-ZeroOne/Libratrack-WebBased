@@ -57,6 +57,8 @@ import { ReactComponent as ErrorHexaIcon } from "./info-hexa.svg?react";
 import { ReactComponent as StudentIcon } from "./student-person.svg?react";
 import { ReactComponent as UserDeactivated } from "./user-deactivated.svg?react";
 import { ReactComponent as QRCodeIcon } from "./qr.svg?react";
+import { ReactComponent as BarcodeScannerIcon } from "./barcode-scanner.svg?react";
+import { ReactComponent as CrossIcon } from "./cross-icon.svg?react";
 
 export {
   ErrorHexaIcon,
@@ -118,4 +120,6 @@ export {
   StudentIcon,
   UserDeactivated,
   QRCodeIcon,
+  BarcodeScannerIcon,
+  CrossIcon,
 };

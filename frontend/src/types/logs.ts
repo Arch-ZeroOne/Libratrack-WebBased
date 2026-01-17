@@ -3,4 +3,5 @@ export interface Log {
   school_id: string;
   time_in: string;
   time_out: string;
+  date_logged: string;
 }
