@@ -8,7 +8,6 @@ import {
 import { Log } from "../../types/logs";
 import client from "../../axiosClient";
 import { useRow } from "../../context/LogsRowContext";
-import toast, { Toaster } from "react-hot-toast";
 import * as util from "../../util/util";
 //TODO
 //Implement Logging of student through qr
@@ -24,7 +23,7 @@ import { AgGridReact } from "ag-grid-react";
 import { QRCodeIcon, BarcodeScannerIcon, CrossIcon, IdIcon } from "../../icons";
 
 import { API_STATUS } from "../../constants/statuses";
-
+import Swal from "sweetalert2";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 //settings for camera
@@ -68,7 +67,6 @@ const HTML5QrCodePlugin = (props: ComponentCallbackProps) => {
   //Initialized to hold a global reference
 
   useEffect(() => {
-    console.log(scannerStart.current);
     const startScan = () => {
       //Creates the configuration
       const config = createConfig(props);
@@ -139,9 +137,13 @@ function ScanQR() {
       const { data } = response;
       const { status } = error.response;
       if (status === API_STATUS.NOT_FOUND) {
-        notifyFailure();
+        Swal.fire({
+          title: "Error Logging Student",
+          text: "Student logging unsuccessful",
+          icon: "error",
+        });
       }
-      nofify();
+
       getData();
     } catch (error) {
       console.error("Error Logging Student:", error);
@@ -166,18 +168,20 @@ function ScanQR() {
   };
 
   const onError = () => {};
+
   const handleBarcodePrompt = () => {
     const modal = document.getElementById("my_modal_5") as HTMLDialogElement;
     modalRef.current = modal;
     modal.showModal();
   };
 
-  const handleAddLog = () => {
+  const handleLogPrompt = () => {
     const modal = document.getElementById("addModal") as HTMLDialogElement;
     modalRef.current = modal;
     modal.showModal();
   };
 
+  //For barcode scan event function
   const onKeyDown = async (e: React.KeyboardEvent) => {
     console.log(e.key);
     if (e.key === "Enter") {
@@ -186,14 +190,17 @@ function ScanQR() {
         const response = await client.post("/logs/login", { id: qrValue });
         const { data } = response;
 
-        nofify();
         getData();
         setQrValue("");
         if (modalRef.current) modalRef.current.close();
       } catch (error) {
         const { status } = error.response;
         if (status === API_STATUS.NOT_FOUND) {
-          notifyFailure();
+          Swal.fire({
+            title: "Error Logging Student",
+            text: "Student logging unsuccessful",
+            icon: "error",
+          });
         }
         console.error("Error While Scanning in barcode:", error);
       }
@@ -208,23 +215,27 @@ function ScanQR() {
       const { data } = response;
 
       if (modalRef.current) modalRef.current.close();
-      nofify();
+
       getData();
       setSchoolId("");
     } catch (error) {
       const { status } = error.response;
+
       if (status === API_STATUS.NOT_FOUND) {
-        notifyFailure();
+        Swal.fire({
+          title: "Error Logging Student",
+          text: "Student logging unsuccessful",
+          icon: "error",
+        });
       }
-      console.error("Error Adding New Log:", error);
+
+      if (modalRef.current) modalRef.current.close();
+      setSchoolId("");
     }
   };
 
-  const nofify = () => toast.success("Student Logged In");
-  const notifyFailure = () => toast.error("Student Not Found");
   return (
     <section className="flex flex-col">
-      <Toaster />
       <AddLogModal
         schoolId={schoolId}
         setSchoolId={setSchoolId}
@@ -262,7 +273,8 @@ function ScanQR() {
         <QRCodeIcon fontSize={50} />
         <h1 className="text-2xl font-bold">Student Logs</h1>
       </div>
-      <section className="flex items-center justify-around gap-3">
+      {/* Table parent and components */}
+      <section className="flex items-center justify-around gap-3 flex-col">
         <div className="w-full self-start mt-3 flex  flex-col gap-2">
           <div className="flex gap-2">
             <button
@@ -274,18 +286,20 @@ function ScanQR() {
             </button>
             <button
               className="btn btn-outline btn-success"
-              onClick={() => handleAddLog()}
+              onClick={() => handleLogPrompt()}
             >
               Add Log <CrossIcon fontSize={30} color="white" />
             </button>
           </div>
-          <HTML5QrCodePlugin
+
+          {/* QR Code Scanning */}
+          {/* <HTML5QrCodePlugin
             fps={10}
             qrbox={250}
             disableFlip={false}
             qrCodeSuccessCallback={onNewScanResult}
             qrCodeErrorCallback={onError}
-          />
+          /> */}
         </div>
         <div className="flex justify-center">
           <LogsTable />
@@ -302,10 +316,10 @@ const LogsTable = () => {
 
   // Column Definitions: Defines & controls grid columns.
   const [colDefs, setColDefs] = useState<ColDef<Log>[]>([
-    { field: "school_id" },
-    { field: "time_in" },
-    { field: "time_out" },
-    { field: "date_logged" },
+    { field: "school_id", headerName: "School ID" },
+    { field: "time_in", headerName: "Time In" },
+    { field: "time_out", headerName: "Time Out" },
+    { field: "date_logged", headerName: "Date Logged" },
   ]);
 
   useEffect(() => {

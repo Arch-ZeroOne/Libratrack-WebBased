@@ -99,7 +99,7 @@ const StudentTable = () => {
     try {
       const response = await client.patch(
         `/students/update/${selectedStudent.student_id}`,
-        payload
+        payload,
       );
 
       if (response.data.length != 0) {
