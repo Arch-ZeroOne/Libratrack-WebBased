@@ -13,12 +13,11 @@ export const logs = async (req, res) => {
 export const logIn = async (req, res) => {
   try {
     const loggedIn = await logService.logIn(req.body);
-    console.log(!loggedIn);
-    if (!loggedIn) {
+    if (loggedIn.length === 0) {
       res.status(404).json({ error: "Student Not Found" });
       return;
     }
-    res.status(200).json({ success: "Student logged In" });
+    res.status(200).json({ success: "Student logged In", data: loggedIn });
   } catch (error) {
     console.error("Error Logging Student:", error);
     res.status(500).json({ error: "Internal Server Error" });

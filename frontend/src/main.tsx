@@ -8,6 +8,7 @@ import { ThemeProvider } from "./context/ThemeContext.tsx";
 import { RouterProvider } from "react-router";
 import { LogsProvider } from "./context/LogsRowContext.tsx";
 import router from "./router.tsx";
+import "react-datepicker/dist/react-datepicker.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -18,5 +19,5 @@ createRoot(document.getElementById("root")!).render(
         </AppWrapper>
       </LogsProvider>
     </ThemeProvider>
-  </StrictMode>
+  </StrictMode>,
 );

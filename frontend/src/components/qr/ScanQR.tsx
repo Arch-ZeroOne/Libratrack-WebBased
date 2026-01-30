@@ -11,6 +11,7 @@ import { useRow } from "../../context/LogsRowContext";
 import * as util from "../../util/util";
 import CourseFilter from "../filters/CourseFilter";
 import DateFilter from "../filters/DateFilter";
+
 //TODO
 //Implement Logging of student through qr
 
@@ -22,7 +23,13 @@ import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 // Core CSS
 import { AgGridReact } from "ag-grid-react";
 
-import { QRCodeIcon, BarcodeScannerIcon, CrossIcon, IdIcon } from "../../icons";
+import {
+  QRCodeIcon,
+  BarcodeScannerIcon,
+  CrossIcon,
+  IdIcon,
+  CalenderIcon,
+} from "../../icons";
 
 import { API_STATUS } from "../../constants/statuses";
 import Swal from "sweetalert2";
@@ -216,8 +223,14 @@ function ScanQR() {
       });
       const { data } = response;
 
-      if (modalRef.current) modalRef.current.close();
+      console.log(data);
 
+      if (modalRef.current) modalRef.current.close();
+      Swal.fire({
+        title: "Student SuccessFully",
+        text: "Student logging unsuccessful",
+        icon: "success",
+      });
       getData();
       setSchoolId("");
     } catch (error) {
@@ -278,7 +291,7 @@ function ScanQR() {
       {/* Table parent and components */}
       <section className="flex items-center justify-around gap-3 flex-col">
         <div className="w-full self-start mt-3 flex  flex-col gap-2">
-          <section className="flex gap-2 items-center justify-around">
+          <section className="flex gap-2 items-center justify-between">
             <div className="flex gap-2 ">
               <button
                 className="btn btn-outline btn-primary"
@@ -309,7 +322,7 @@ function ScanQR() {
             qrCodeErrorCallback={onError}
           /> */}
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center w-full">
           <LogsTable />
         </div>
       </section>
@@ -324,11 +337,25 @@ const LogsTable = () => {
 
   // Column Definitions: Defines & controls grid columns.
   const [colDefs, setColDefs] = useState<ColDef<Log>[]>([
-    { field: "school_id", headerName: "School ID" },
-    { field: "time_in", headerName: "Time In" },
-    { field: "time_out", headerName: "Time Out" },
-    { field: "date_logged", headerName: "Date Logged" },
+    {
+      field: "school_id",
+      headerName: "School ID",
+      filter: true,
+      sortable: true,
+    },
+    { field: "time_in", headerName: "Time In", filter: true, sortable: true },
+    { field: "time_out", headerName: "Time Out", filter: true, sortable: true },
+    {
+      field: "date_logged",
+      headerName: "Date Logged",
+      filter: true,
+      sortable: true,
+    },
   ]);
+
+  const defaultColDef = {
+    flex: 3,
+  };
 
   useEffect(() => {
     try {
@@ -348,8 +375,12 @@ const LogsTable = () => {
   }, []);
 
   return (
-    <div style={{ width: 800, height: 800 }}>
-      <AgGridReact rowData={rowData} columnDefs={colDefs} />
+    <div className="w-full h-100">
+      <AgGridReact
+        rowData={rowData}
+        columnDefs={colDefs}
+        defaultColDef={defaultColDef}
+      />
     </div>
   );
 };

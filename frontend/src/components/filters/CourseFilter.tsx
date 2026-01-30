@@ -2,13 +2,22 @@ import React from "react";
 
 function CourseFilter() {
   return (
-    <div className="dropdown dropdown-top dropdown-center">
-      <div tabIndex={0} role="button" className="btn m-1">
-        Click ⬆️
-      </div>
+    <>
+      {/* change popover-1 and --anchor-1 names. Use unique names for each dropdown */}
+      {/* For TSX uncomment the commented types below */}
+      <button
+        className="btn btn-primary"
+        popoverTarget="popover-1"
+        style={{ anchorName: "--anchor-1" } /* as React.CSSProperties */}
+      >
+        Filter By Course
+      </button>
+
       <ul
-        tabIndex={Number("-1")}
-        className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+        className="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
+        popover="auto"
+        id="popover-1"
+        style={{ positionAnchor: "--anchor-1" } /* as React.CSSProperties */}
       >
         <li>
           <a>BSIT</a>
@@ -23,7 +32,7 @@ function CourseFilter() {
           <a>BSA</a>
         </li>
       </ul>
-    </div>
+    </>
   );
 }
 

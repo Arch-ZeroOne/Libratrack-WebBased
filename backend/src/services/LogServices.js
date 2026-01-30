@@ -11,9 +11,7 @@ export const logIn = async (params) => {
   const { id } = params;
 
   const existing = await searchStudent(id);
-  console.log(`Student Exists: ${existing}`);
   if (!existing) {
-    console.log("Not Existing");
     return [];
   }
 
@@ -23,13 +21,11 @@ export const logIn = async (params) => {
     [id],
   );
 
-  console.log("Active Session Length:", active.length);
-
   if (active.length > 0) {
     await logOut(id);
 
     //Prevent default logging in
-    return true;
+    return rows[0];
   }
 
   //Logs in new logged user
@@ -38,7 +34,7 @@ export const logIn = async (params) => {
     [id, util.getFormattedTime(), util.getFormattedDate()],
   );
 
-  return rows;
+  return rows[0];
 };
 
 export const logOut = async (school_id) => {
