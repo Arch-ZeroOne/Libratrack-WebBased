@@ -9,6 +9,8 @@ import { Log } from "../../types/logs";
 import client from "../../axiosClient";
 import { useRow } from "../../context/LogsRowContext";
 import * as util from "../../util/util";
+import CourseFilter from "../filters/CourseFilter";
+import DateFilter from "../filters/DateFilter";
 //TODO
 //Implement Logging of student through qr
 
@@ -276,21 +278,27 @@ function ScanQR() {
       {/* Table parent and components */}
       <section className="flex items-center justify-around gap-3 flex-col">
         <div className="w-full self-start mt-3 flex  flex-col gap-2">
-          <div className="flex gap-2">
-            <button
-              className="btn btn-outline btn-primary"
-              onClick={() => handleBarcodePrompt()}
-            >
-              Use Scanner
-              <BarcodeScannerIcon fontSize={30} />
-            </button>
-            <button
-              className="btn btn-outline btn-success"
-              onClick={() => handleLogPrompt()}
-            >
-              Add Log <CrossIcon fontSize={30} color="white" />
-            </button>
-          </div>
+          <section className="flex gap-2 items-center justify-around">
+            <div className="flex gap-2 ">
+              <button
+                className="btn btn-outline btn-primary"
+                onClick={() => handleBarcodePrompt()}
+              >
+                Use Scanner
+                <BarcodeScannerIcon fontSize={30} />
+              </button>
+              <button
+                className="btn btn-outline btn-success"
+                onClick={() => handleLogPrompt()}
+              >
+                Add Log <CrossIcon fontSize={30} color="white" />
+              </button>
+            </div>
+            <div className="flex gap-2 items-center">
+              <CourseFilter />
+              <DateFilter />
+            </div>
+          </section>
 
           {/* QR Code Scanning */}
           {/* <HTML5QrCodePlugin
