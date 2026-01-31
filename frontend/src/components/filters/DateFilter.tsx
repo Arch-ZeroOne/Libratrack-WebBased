@@ -1,18 +1,18 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 
 import { CalenderIcon } from "../../icons";
+import { useDate } from "../../context/DateContext";
+
 function DateFilter() {
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const { setLogDate } = useDate();
 
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setStartDate(new Date(event.target.value));
-  };
-
-  useEffect(() => {
-    console.log(startDate);
-  }, [startDate]);
-
-  return <input type="datetime-local" className="input" />;
+  return (
+    <input
+      type="datetime-local"
+      className="input"
+      onChange={(event) => setLogDate(event.target.value)}
+    />
+  );
 }
 
 export default DateFilter;

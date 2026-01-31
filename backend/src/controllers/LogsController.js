@@ -33,3 +33,15 @@ export const logOut = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const filterByCourse = async (req, res) => {
+  try {
+    const filtered = await logService.filterByCourse(req.body);
+    if (filtered) {
+      res.status(200).json({ sucess: "Students Found", data: filtered });
+    }
+  } catch (error) {
+    console.error("Error Filtering Logs Data");
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import ComponentCard from "../../common/ComponentCard";
 import Label from "../Label";
 import Input from "../input/InputField";
@@ -6,6 +6,7 @@ import client from "../../../axiosClient.ts";
 import Swal from "sweetalert2";
 import { API_STATUS } from "../../../constants/statuses.ts";
 import { useNavigate } from "react-router";
+import { Dropdown } from "../../ui/dropdown/Dropdown.tsx";
 export default function AddNewStudent() {
   //TODO polishing the ui here and will add modals or alerts
 
@@ -14,8 +15,12 @@ export default function AddNewStudent() {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [course, setCourse] = useState("BSIT");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    console.log(course);
+  }, [course]);
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     try {
@@ -25,6 +30,7 @@ export default function AddNewStudent() {
         lastname,
         email,
         phone,
+        course,
       };
 
       const response = await client.post("/students", payload);
@@ -72,6 +78,18 @@ export default function AddNewStudent() {
             <Input
               type="text"
               placeholder="Firstname"
+              eCommerce
+              Analytics
+              Marketing
+              CRM
+              Stocks
+              SaaS
+              New
+              Logistics
+              New
+              AI
+              Assistant
+              New
               value={firstname}
               onChange={(event) => setFirstname(event.target.value)}
             />
@@ -111,6 +129,20 @@ export default function AddNewStudent() {
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
             />
+          </div>
+          <div>
+            <Label htmlFor="inputTwo">Course</Label>
+            <select
+              defaultValue="BSIT"
+              className="select w-full"
+              onChange={(e) => setCourse(e.target.value)}
+            >
+              <option disabled={true}>Student Course</option>
+              <option value="BSIT">BSIT</option>
+              <option value="BSBA">BSBA</option>
+              <option value="BSA">BSA</option>
+              <option value="BTLED">BTLED</option>
+            </select>
           </div>
 
           <div className="flex justify-center">

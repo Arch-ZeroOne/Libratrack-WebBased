@@ -10,10 +10,10 @@ export const getAllStudents = async () => {
 };
 
 export const addNewStudent = async (account) => {
-  const { firstname, middlename, lastname, email, phone } = account;
+  const { firstname, middlename, lastname, email, phone, course } = account;
   const schoolId = await util.generateSchoolId();
   const { rows } = await query(
-    "INSERT INTO students (firstname,middlename,lastname,email,phone,school_id,created_at,status) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *",
+    "INSERT INTO students (firstname,middlename,lastname,email,phone,school_id,created_at,status,course) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
     [
       firstname,
       middlename,
@@ -23,6 +23,7 @@ export const addNewStudent = async (account) => {
       schoolId,
       util.getFormattedDate(),
       "Active",
+      course,
     ],
   );
 

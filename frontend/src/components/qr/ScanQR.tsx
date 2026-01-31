@@ -11,6 +11,7 @@ import { useRow } from "../../context/LogsRowContext";
 import * as util from "../../util/util";
 import CourseFilter from "../filters/CourseFilter";
 import DateFilter from "../filters/DateFilter";
+import { useCourse } from "../../context/CourseContext";
 
 //TODO
 //Implement Logging of student through qr
@@ -33,6 +34,7 @@ import {
 
 import { API_STATUS } from "../../constants/statuses";
 import Swal from "sweetalert2";
+import { useDate } from "../../context/DateContext";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 //settings for camera
@@ -334,6 +336,8 @@ function ScanQR() {
 const LogsTable = () => {
   // Row Data: The data to be displayed.
   const { rowData, setRowData } = useRow();
+  const { preferedCourse } = useCourse();
+  const { logDate } = useDate();
 
   // Column Definitions: Defines & controls grid columns.
   const [colDefs, setColDefs] = useState<ColDef<Log>[]>([
@@ -348,6 +352,12 @@ const LogsTable = () => {
     {
       field: "date_logged",
       headerName: "Date Logged",
+      filter: true,
+      sortable: true,
+    },
+    {
+      field: "course",
+      headerName: "Course",
       filter: true,
       sortable: true,
     },
@@ -373,6 +383,48 @@ const LogsTable = () => {
       console.error("Error Fetching Logs:", error);
     }
   }, []);
+
+  useEffect(() => {
+    try {
+      if (preferedCourse) {
+        const fetchLogs = async () => {
+          const response = await client.get("/logs");
+          let { data } = response;
+
+          data.map((data: Log) => {
+            data.date_logged = util.getFullDate(data.date_logged);
+          });
+
+          if (preferedCourse === "ALL") {
+            setRowData(data);
+            return;
+          }
+
+          const filtered = data.filter(
+            (log: Log) =>
+              preferedCourse?.trim().toLowerCase() ===
+              log.course?.trim().toLowerCase(),
+          );
+
+          setRowData(filtered);
+        };
+        fetchLogs();
+      }
+
+      //TODO currently handling date change and conversion
+      if (logDate) {
+        if (rowData) {
+          const filtered = rowData.filter(
+            (log: Log) => log.date_logged === logDate,
+          );
+          console.log(filtered);
+          setRowData(filtered);
+        }
+      }
+    } catch (error) {
+      console.error("Error Fetching Logs:", error);
+    }
+  }, [preferedCourse, logDate]);
 
   return (
     <div className="w-full h-100">

@@ -9,8 +9,9 @@ export const logs = async () => {
 };
 export const logIn = async (params) => {
   const { id } = params;
-
+  const course = await util.getCourse(id);
   const existing = await searchStudent(id);
+
   if (!existing) {
     return [];
   }
@@ -22,7 +23,7 @@ export const logIn = async (params) => {
   );
 
   if (active.length > 0) {
-    await logOut(id);
+    const rows = await logOut(id);
 
     //Prevent default logging in
     return rows[0];
@@ -30,8 +31,8 @@ export const logIn = async (params) => {
 
   //Logs in new logged user
   const { rows } = await query(
-    "INSERT INTO logs (school_id,time_in,date_logged) VALUES ($1,$2,$3) RETURNING *",
-    [id, util.getFormattedTime(), util.getFormattedDate()],
+    "INSERT INTO logs (school_id,time_in,date_logged,course) VALUES ($1,$2,$3,$4) RETURNING *",
+    [id, util.getFormattedTime(), util.getFormattedDate(), course],
   );
 
   return rows[0];
@@ -42,6 +43,14 @@ export const logOut = async (school_id) => {
     "UPDATE logs SET time_out = $1 WHERE time_out IS NULL AND school_id = $2  RETURNING *",
     [util.getFormattedTime(), school_id],
   );
+
+  return rows;
+};
+
+export const filterByCourse = async (course) => {
+  const { rows } = await query("SELECT * FROM logs WHERE course = $1", [
+    course,
+  ]);
 
   return rows;
 };
