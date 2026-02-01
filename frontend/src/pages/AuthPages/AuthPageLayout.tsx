@@ -20,13 +20,13 @@ export default function AuthLayout({
               <Link to="/" className="block mb-4">
                 <img
                   width={231}
-                  height={48}
-                  src="/images/logo/auth-logo.svg"
+                  height={40}
+                  src="/images/icons/dorsu-logo.png"
                   alt="Logo"
                 />
               </Link>
               <p className="text-center text-gray-400 dark:text-white/60">
-                Free and Open-Source Tailwind CSS Admin Dashboard Template
+                Fast Student Tracking and Book Borrowing
               </p>
             </div>
           </div>

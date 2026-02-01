@@ -346,7 +346,7 @@ const AppSidebar: React.FC = () => {
               <img src={dorsuLogo} alt="Logo" width={32} height={32} />
             )}
           </Link>
-          <h1>LibraTrack</h1>
+          <h1 className="font-semibold text-xl">LibraTrack</h1>
         </div>
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
