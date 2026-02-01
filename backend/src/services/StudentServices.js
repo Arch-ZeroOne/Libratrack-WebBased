@@ -83,7 +83,5 @@ export const searchStudent = async (schoolId) => {
     schoolId,
   ]);
 
-  console.log(rows);
-
-  return rows.length !== 0;
+  return rows;
 };

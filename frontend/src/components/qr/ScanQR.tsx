@@ -194,25 +194,52 @@ function ScanQR() {
 
   //For barcode scan event function
   const onKeyDown = async (e: React.KeyboardEvent) => {
-    console.log(e.key);
     if (e.key === "Enter") {
       try {
         //Logs in or Logs out the Student
         const response = await client.post("/logs/login", { id: qrValue });
         const { data } = response;
 
+        const credentials = data.data;
+        const fullname = `${credentials.firstname} ${credentials.lastname}`;
+
+        if (modalRef.current) modalRef.current.close();
+
+        if (credentials.time_out) {
+          Swal.fire({
+            title: "Student",
+            text: `${fullname} has been logged out successfully`,
+            icon: "success",
+          });
+        } else {
+          Swal.fire({
+            title: "Student",
+            text: `${fullname} has been logged in successfully`,
+            icon: "success",
+          });
+        }
         getData();
         setQrValue("");
-        if (modalRef.current) modalRef.current.close();
       } catch (error) {
+        if (modalRef.current) modalRef.current.close();
+
         const { status } = error.response;
         if (status === API_STATUS.NOT_FOUND) {
           Swal.fire({
             title: "Error Logging Student",
-            text: "Student logging unsuccessful",
+            text: "No Student Data Found",
             icon: "error",
           });
         }
+        if (status === API_STATUS.CONFLICT) {
+          Swal.fire({
+            title: "Error Logging Student",
+            text: "Student Has Been Deactivated",
+            icon: "error",
+          });
+        }
+
+        setQrValue("");
         console.error("Error While Scanning in barcode:", error);
       }
     }
@@ -224,15 +251,25 @@ function ScanQR() {
         id: `STU-${schoolId}`,
       });
       const { data } = response;
-
-      console.log(data);
+      const credentials = data.data;
+      const fullname = `${credentials.firstname} ${credentials.lastname}`;
 
       if (modalRef.current) modalRef.current.close();
-      Swal.fire({
-        title: "Student SuccessFully",
-        text: "Student logging unsuccessful",
-        icon: "success",
-      });
+
+      if (credentials.time_out) {
+        Swal.fire({
+          title: "Student",
+          text: `${fullname} has been logged out successfully`,
+          icon: "success",
+        });
+      } else {
+        Swal.fire({
+          title: "Student",
+          text: `${fullname} has been logged in successfully`,
+          icon: "success",
+        });
+      }
+
       getData();
       setSchoolId("");
     } catch (error) {
@@ -241,7 +278,14 @@ function ScanQR() {
       if (status === API_STATUS.NOT_FOUND) {
         Swal.fire({
           title: "Error Logging Student",
-          text: "Student logging unsuccessful",
+          text: "No Student Data Found",
+          icon: "error",
+        });
+      }
+      if (status === API_STATUS.CONFLICT) {
+        Swal.fire({
+          title: "Error Logging Student",
+          text: "Student Has Been Deactivated",
           icon: "error",
         });
       }
@@ -347,6 +391,24 @@ const LogsTable = () => {
       filter: true,
       sortable: true,
     },
+    {
+      field: "firstname",
+      headerName: "Firstname",
+      filter: true,
+      sortable: true,
+    },
+    {
+      field: "middlename",
+      headerName: "Middlename",
+      filter: true,
+      sortable: true,
+    },
+    {
+      field: "lastname",
+      headerName: "Lastname",
+      filter: true,
+      sortable: true,
+    },
     { field: "time_in", headerName: "Time In", filter: true, sortable: true },
     { field: "time_out", headerName: "Time Out", filter: true, sortable: true },
     {
@@ -395,39 +457,41 @@ const LogsTable = () => {
             data.date_logged = util.getFullDate(data.date_logged);
           });
 
+          //If course is back to all revert back with the date filter
           if (preferedCourse === "ALL") {
-            setRowData(data);
+            const dateFiltered = data.filter(
+              (log: Log) => log.date_logged == util.getFullDate(logDate),
+            );
+            setRowData(dateFiltered);
             return;
           }
 
-          const filtered = data.filter(
+          data.map((data: Log) => {
+            data.date_logged = util.getFullDate(data.date_logged);
+          });
+          const courseFiltered = data.filter(
             (log: Log) =>
               preferedCourse?.trim().toLowerCase() ===
               log.course?.trim().toLowerCase(),
           );
 
-          setRowData(filtered);
+          const dateFiltered = courseFiltered.filter(
+            (log: Log) => log.date_logged == util.getFullDate(logDate),
+          );
+          console.log(dateFiltered);
+          setRowData(dateFiltered);
         };
         fetchLogs();
       }
 
       //TODO currently handling date change and conversion
-      if (logDate) {
-        if (rowData) {
-          const filtered = rowData.filter(
-            (log: Log) => log.date_logged === logDate,
-          );
-          console.log(filtered);
-          setRowData(filtered);
-        }
-      }
     } catch (error) {
       console.error("Error Fetching Logs:", error);
     }
   }, [preferedCourse, logDate]);
 
   return (
-    <div className="w-full h-100">
+    <div className="w-full h-150">
       <AgGridReact
         rowData={rowData}
         columnDefs={colDefs}

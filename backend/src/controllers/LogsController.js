@@ -17,6 +17,11 @@ export const logIn = async (req, res) => {
       res.status(404).json({ error: "Student Not Found" });
       return;
     }
+
+    if (!loggedIn) {
+      res.status(409).json({ error: "Student Deactivated" });
+      return;
+    }
     res.status(200).json({ success: "Student logged In", data: loggedIn });
   } catch (error) {
     console.error("Error Logging Student:", error);

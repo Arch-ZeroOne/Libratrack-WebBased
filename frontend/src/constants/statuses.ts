@@ -3,4 +3,5 @@ export const API_STATUS = {
   CREATED: 201,
   NOT_FOUND: 404,
   SERVER_ERROR: 500,
+  CONFLICT: 409,
 };

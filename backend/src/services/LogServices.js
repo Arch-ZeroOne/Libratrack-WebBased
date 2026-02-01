@@ -9,11 +9,16 @@ export const logs = async () => {
 };
 export const logIn = async (params) => {
   const { id } = params;
+  console.log("ID:", id);
   const course = await util.getCourse(id);
   const existing = await searchStudent(id);
 
-  if (!existing) {
+  if (!existing || existing.length === 0) {
     return [];
+  }
+
+  if (existing[0].status === "Deactivated") {
+    return false;
   }
 
   //Check active sessions (Not logged out user)
@@ -31,10 +36,17 @@ export const logIn = async (params) => {
 
   //Logs in new logged user
   const { rows } = await query(
-    "INSERT INTO logs (school_id,time_in,date_logged,course) VALUES ($1,$2,$3,$4) RETURNING *",
-    [id, util.getFormattedTime(), util.getFormattedDate(), course],
+    "INSERT INTO logs (school_id,time_in,date_logged,course,firstname,middlename,lastname) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+    [
+      id,
+      util.getFormattedTime(),
+      util.getFormattedDate(),
+      course,
+      existing[0].firstname,
+      existing[0].middlename,
+      existing[0].lastname,
+    ],
   );
-
   return rows[0];
 };
 

@@ -40,6 +40,7 @@ function ManageStudent() {
       >
         Add Student
       </button>
+
       <StudentTable />
     </section>
   );

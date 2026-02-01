@@ -41,6 +41,11 @@ export async function getCourse(studentId) {
   const { rows } = await query("SELECT * FROM students WHERE school_id = $1", [
     studentId,
   ]);
-  console.log(rows[0].course);
-  return rows[0].course;
+
+  if (rows.length != 0) {
+    console.log(rows[0].course);
+    return rows[0].course;
+  }
+
+  return null;
 }
