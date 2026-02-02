@@ -6,6 +6,7 @@ import type { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react"; // React Data Grid Component
 import { Student, GetStudentPayload } from "../../types/student";
 import * as util from "../../util/util";
+import StatusRenderer from "../../components/cellrenderer/StatusRenderer";
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -166,6 +167,7 @@ const StudentTable = () => {
     },
     {
       field: "status",
+      cellRenderer: StatusRenderer,
       headerName: "Student Status",
     },
     {
@@ -313,20 +315,18 @@ const StudentTable = () => {
             </div>
             <div>
               <label className="text-xs">Status</label>
-              <input
-                type="text"
-                className="input"
-                placeholder="Update Status"
-                list="statuses"
-                value={status}
+
+              <select
+                defaultValue="Active"
+                className="select"
                 onChange={(event) => setStatus(event.target.value)}
-              />
-              <datalist id="statuses">
-                <option value="Active"></option>
-                <option value="Inactive"></option>
-                <option value="Deactivated"></option>
-                <option value="Banned"></option>
-              </datalist>
+              >
+                <option disabled={true}>Update Course</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Deactivated">Deactivated</option>
+                <option value="Banned">Banned</option>
+              </select>
             </div>
             <button className="btn btn-success mt-3 self-center">
               Update Student
