@@ -14,7 +14,13 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 //Imported components for crud operations using action buttons
 
 import { ICellRendererParams } from "ag-grid-community";
-import { UserDeactivated, PencilIcon, EyeIcon } from "../../icons";
+import {
+  UserDeactivated,
+  PencilIcon,
+  EyeIcon,
+  CheckIcon,
+  UserSlashIcon,
+} from "../../icons";
 import { useNavigate } from "react-router";
 
 const MODALACTIONS = {
@@ -29,6 +35,8 @@ interface ActionCellProps extends ICellRendererParams<Student> {
   onEdit: (row: Student, actions: string) => void;
   onDelete: (row: Student) => void;
   onShow: (row: Student) => void;
+  onActivate: (row: Student) => void;
+  onBanned: (row: Student) => void;
 }
 
 function ManageStudent() {
@@ -118,6 +126,52 @@ const StudentTable = () => {
     }
   };
 
+  const onActivate = (row: Student) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Activate Student!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const getStudent = await client.get(`/students/${row.student_id}`);
+
+          const response_payload = getStudent.data;
+          const { status } = response_payload;
+
+          if (status === "Active") {
+            Swal.fire({
+              title: "Already Activated!",
+              text: "Student Account is already activated.",
+              icon: "info",
+            });
+            return;
+          }
+
+          const request = await client.patch(
+            `/students/activate/${row.student_id}`,
+          );
+          const data = request.data;
+
+          if (data) {
+            fetchData();
+            Swal.fire({
+              title: "Student Account Activated!",
+              text: "Student has been Activated.",
+              icon: "success",
+            });
+          }
+        } catch (error) {
+          console.error("Error Actvating Student:", error);
+        }
+      }
+    });
+  };
+
   const onDelete = (row: Student) => {
     Swal.fire({
       title: "Are you sure?",
@@ -130,13 +184,29 @@ const StudentTable = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const request = await client.patch(`/students/${row.student_id}`);
+          const getStudent = await client.get(`/students/${row.student_id}`);
+
+          const response_payload = getStudent.data;
+          const { status } = response_payload;
+
+          if (status === "Deactivated") {
+            Swal.fire({
+              title: "Already Deactivated!",
+              text: "Student Account is already deactivated.",
+              icon: "info",
+            });
+            return;
+          }
+
+          const request = await client.patch(
+            `/students/deactivate/${row.student_id}`,
+          );
           const data = request.data;
 
           if (data) {
             fetchData();
             Swal.fire({
-              title: "Student Deactivted!",
+              title: "Student Deactivated!",
               text: "Student has been deactivated.",
               icon: "success",
             });
@@ -148,27 +218,93 @@ const StudentTable = () => {
     });
   };
 
+  const onBanned = (row: Student) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Ban Student!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const getStudent = await client.get(`/students/${row.student_id}`);
+
+          const response_payload = getStudent.data;
+          const { status } = response_payload;
+
+          if (status === "Banned") {
+            Swal.fire({
+              title: "Already Banned!",
+              text: "Student Account is already banned.",
+              icon: "info",
+            });
+            return;
+          }
+
+          const request = await client.patch(`/students/ban/${row.student_id}`);
+          const data = request.data;
+
+          if (data) {
+            fetchData();
+            Swal.fire({
+              title: "Student Banned!",
+              text: "Student has been banned.",
+              icon: "success",
+            });
+          }
+        } catch (error) {
+          console.error("Error Banning Student:", error);
+        }
+      }
+    });
+  };
+
   const onShow = (row: Student) => {
     navigate(`/admin/student-qr/${row.school_id}`);
   };
 
   // Column Definitions: Defines & controls grid columns.
   const [colDefs, setColDefs] = useState<ColDef<Student>[]>([
-    { field: "firstname", headerName: "First Name" },
-    { field: "middlename", headerName: "Middle Name" },
-    { field: "lastname", headerName: "Last Name" },
+    {
+      field: "firstname",
+      headerName: "First Name",
+      sortable: true,
+      filter: true,
+    },
+    {
+      field: "middlename",
+      headerName: "Middle Name",
+      sortable: true,
+      filter: true,
+    },
+    {
+      field: "lastname",
+      headerName: "Last Name",
+      sortable: true,
+      filter: true,
+    },
     {
       field: "email",
       headerName: "Email",
+      sortable: true,
+      filter: true,
     },
     {
       field: "school_id",
       headerName: "School ID",
+
+      sortable: true,
+      filter: true,
     },
     {
       field: "status",
       cellRenderer: StatusRenderer,
       headerName: "Student Status",
+      sortable: true,
+      filter: true,
     },
     {
       headerName: "Actions",
@@ -176,6 +312,8 @@ const StudentTable = () => {
         onEdit,
         onDelete,
         onShow,
+        onActivate,
+        onBanned,
       },
       cellRenderer: ActionCell,
     },
@@ -319,6 +457,7 @@ const StudentTable = () => {
               <select
                 defaultValue="Active"
                 className="select"
+                value={status}
                 onChange={(event) => setStatus(event.target.value)}
               >
                 <option disabled={true}>Update Course</option>
@@ -357,6 +496,8 @@ const ActionCell: React.FC<ActionCellProps> = ({
   onEdit,
   onDelete,
   onShow,
+  onActivate,
+  onBanned,
 }) => {
   //Returns if there is no data
   if (!data) return null;
@@ -369,11 +510,14 @@ const ActionCell: React.FC<ActionCellProps> = ({
       >
         <PencilIcon fontSize={28} />
       </div>
+      <div title="Activate Student">
+        <CheckIcon fontSize={25} onClick={() => onActivate(data)} />
+      </div>
+      <div title="Ban Student">
+        <UserSlashIcon fontSize={23} onClick={() => onBanned(data)} />
+      </div>
       <div title="Deactivate Student">
         <UserDeactivated fontSize={25} onClick={() => onDelete(data)} />
-      </div>
-      <div title="View Student">
-        <EyeIcon fontSize={30} onClick={() => onShow(data)} />
       </div>
     </div>
   );

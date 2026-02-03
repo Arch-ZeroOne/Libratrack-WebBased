@@ -1,4 +1,3 @@
-import React from "react";
 import { ICellRendererParams } from "ag-grid-community";
 function StatusRenderer(params: ICellRendererParams) {
   let style;

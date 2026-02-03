@@ -60,7 +60,8 @@ import { ReactComponent as QRCodeIcon } from "./qr.svg?react";
 import { ReactComponent as BarcodeScannerIcon } from "./barcode-scanner.svg?react";
 import { ReactComponent as CrossIcon } from "./cross-icon.svg?react";
 import { ReactComponent as IdIcon } from "./id-icon.svg?react";
-
+import { ReactComponent as CheckIcon } from "./check.svg?react";
+import { ReactComponent as UserSlashIcon } from "./user-slash.svg?react";
 export {
   ErrorHexaIcon,
   AlertHexaIcon,
@@ -124,4 +125,6 @@ export {
   BarcodeScannerIcon,
   CrossIcon,
   IdIcon,
+  CheckIcon,
+  UserSlashIcon,
 };

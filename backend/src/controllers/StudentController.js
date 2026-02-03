@@ -36,6 +36,32 @@ export const deactivateStudent = async (req, res) => {
   }
 };
 
+export const activateStudent = async (req, res) => {
+  try {
+    const activated = await studentService.activateStudent(req.params);
+
+    res
+      .status(200)
+      .json({ message: "Student Account Activated", student: activated });
+  } catch (error) {
+    console.error("Error Activating Student:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const banStudent = async (req, res) => {
+  try {
+    const activated = await studentService.banStudent(req.params);
+
+    res
+      .status(200)
+      .json({ message: "Student Account Banned", student: activated });
+  } catch (error) {
+    console.error("Error Banning Student:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export const getStudent = async (req, res) => {
   try {
     const student = await studentService.getStudent(req.params);
@@ -55,7 +81,7 @@ export const updateStudent = async (req, res) => {
   try {
     const updatedStudent = await studentService.updateStudent(
       req.params.id,
-      req.body
+      req.body,
     );
     const { rows } = updatedStudent;
 

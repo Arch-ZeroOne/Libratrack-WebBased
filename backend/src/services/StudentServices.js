@@ -78,6 +78,26 @@ export const deactivateStudent = async (account) => {
 
   return rows;
 };
+
+export const activateStudent = async (account) => {
+  const { id } = account;
+  const rows = await query(
+    "UPDATE students SET status = $1 WHERE student_id = $2 RETURNING *",
+    ["Active", id],
+  );
+
+  return rows;
+};
+
+export const banStudent = async (account) => {
+  const { id } = account;
+  const rows = await query(
+    "UPDATE students SET status = $1 WHERE student_id = $2 RETURNING *",
+    ["Banned", id],
+  );
+
+  return rows;
+};
 export const searchStudent = async (schoolId) => {
   const { rows } = await query("SELECT * FROM students WHERE school_id = $1", [
     schoolId,
