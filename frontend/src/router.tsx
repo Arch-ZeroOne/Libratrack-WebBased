@@ -14,9 +14,15 @@ import FormElements from "./pages/Forms/FormElements";
 import AddNewStudent from "./components/form/librarian/AddNewStudent";
 
 //Student QR Views
-
 import QrCode from "./components/qr/QrCode";
 import ScanQR from "./components/qr/ScanQR";
+
+// Book operations views
+import ManageAuthors from "./components/librarian/ManageAuthors";
+import ManageBooks from "./components/librarian/ManageBooks";
+import ManageBorrows from "./components/librarian/ManageBorrows";
+import ManageCopies from "./components/librarian/ManageCopies";
+import ManagePenalties from "./components/librarian/ManagePenalties";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -58,6 +64,26 @@ const router = createBrowserRouter([
       {
         path: "scan-qr",
         element: <ScanQR />,
+      },
+      {
+        path: "authors",
+        element: <ManageAuthors />,
+      },
+      {
+        path: "books",
+        element: <ManageBooks />,
+      },
+      {
+        path: "penalties",
+        element: <ManagePenalties />,
+      },
+      {
+        path: "borrow",
+        element: <ManageBorrows />,
+      },
+      {
+        path: "copies",
+        element: <ManageCopies />,
       },
     ],
   },

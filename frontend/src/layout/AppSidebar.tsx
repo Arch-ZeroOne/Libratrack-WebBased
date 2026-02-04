@@ -16,6 +16,7 @@ import {
   TableIcon,
   UserCircleIcon,
   StudentIcon,
+  BookIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -44,15 +45,38 @@ const navItems: NavItem[] = [
   },
   {
     icon: <StudentIcon />,
-    name: "Manage Student",
+    name: "Students",
     subItems: [
       {
-        name: "Students Table",
+        name: "Manage Student",
         path: "/admin/students",
       },
       {
         name: "Add Log",
         path: "/admin/scan-qr",
+      },
+    ],
+  },
+
+  {
+    icon: <BookIcon />,
+    name: "Books",
+    subItems: [
+      {
+        name: "Manage Books",
+        path: "/admin/books",
+      },
+      {
+        name: "Borrow Books",
+        path: "/admin/borrow",
+      },
+      {
+        name: "Manage Penalties",
+        path: "/admin/penalties",
+      },
+      {
+        name: "Manage Authors",
+        path: "/admin/authors",
       },
     ],
   },
